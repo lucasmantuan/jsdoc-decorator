@@ -1,0 +1,1 @@
+- Alterar os regex para pegar somente tipos especificos
