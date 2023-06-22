@@ -68,17 +68,22 @@ function createParamsDecorations(function_value, jsdoc_value, line_number) {
             }
         };
 
-        // separar em outra função a localização do range
         if (function_line.includes(value)) {
-            const start_index = function_line.indexOf(value);
-            const range = new vscode.Range(
-                new vscode.Position(line_number, start_index),
-                new vscode.Position(line_number, start_index + value.length)
-            );
-
+            const range = createRange(function_line, value, line_number);
             decorations.set(range, render_options);
+            console.log(decorations);
         }
     });
+}
+
+function createRange(function_line, value, line_number) {
+    const start_index = function_line.indexOf(value);
+    const range = new vscode.Range(
+        new vscode.Position(line_number, start_index),
+        new vscode.Position(line_number, start_index + value.length)
+    );
+
+    return range;
 }
 
 // const applyDecorations = (editor) => {
