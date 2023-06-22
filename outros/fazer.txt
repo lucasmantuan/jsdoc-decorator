@@ -1,1 +1,1 @@
-- Alterar os regex para pegar somente tipos especificos
+- Revisar o regex alterando para pegar somente os dados necessários
