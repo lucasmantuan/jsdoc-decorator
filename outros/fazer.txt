@@ -1,1 +1,2 @@
-- Revisar o regex alterando para pegar somente os dados necessários
+- Revisar todos os regex, alterando para casar somente com os dados necessários
+- Verificar, para novas decorações, se a decoração já se encontra no objeto decorations
