@@ -3,6 +3,7 @@ const { decorationsManager } = require('./src/decorations_manager.js');
 
 function activate(context) {
     const editor = vscode.window.activeTextEditor;
+
     decorationsManager(editor);
 
     let disposable = vscode.commands.registerCommand('almost_static.almostStatic', function () {});

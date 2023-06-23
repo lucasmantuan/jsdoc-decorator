@@ -1,2 +1,5 @@
 - Revisar todos os regex, alterando para casar somente com os dados necessários
 - Verificar, para novas decorações, se a decoração já se encontra no objeto decorations
+- Converter as funções para se utilizar a biblioteca lodash
+- Adicionar um debounce na chamada da função ao se digitar um texto
+- Criar o método que aplicar todas as decorações no código

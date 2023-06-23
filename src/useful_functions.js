@@ -1,8 +1,6 @@
 const vscode = require('vscode');
 const { regex } = require('./regex_pattern.js');
 
-const decorations = new Map();
-
 function findDocParameters(source_code) {
     const jsdoc_matches = [...source_code.matchAll(regex.jsdoc.comment)];
     const jsdoc_array = jsdoc_matches.map((match) => match[1].trim().split('\n'));
@@ -40,6 +38,7 @@ function findDocParameters(source_code) {
 
 function createDecorations(source_code, jsdoc_parameters) {
     const function_matches = [...source_code.matchAll(regex.function.declaration)];
+    const decorations = new Map();
 
     function_matches.forEach((function_value) => {
         const function_name = function_value[1];
@@ -48,11 +47,18 @@ function createDecorations(source_code, jsdoc_parameters) {
         jsdoc_parameters.forEach((jsdoc_value) => {
             if (jsdoc_value.name === function_name) {
                 const line_number = lines.findIndex((line) => line.includes(function_value[0]));
-                createParamsDecorations(function_value, jsdoc_value, line_number);
-                createReturnsDecorations(function_value, jsdoc_value, line_number);
+
+                const all_param_decoration = createParamDecoration(function_value, jsdoc_value, line_number);
+                const all_returns_decoration = createReturnsDecoration(function_value, jsdoc_value, line_number);
+
+                [...all_param_decoration, ...all_returns_decoration].forEach(({ range, render_options }) => {
+                    decorations.set(range, render_options);
+                });
             }
         });
     });
+
+    return decorations;
 }
 
 function findDecoration(value, jsdoc_value, type) {
@@ -64,10 +70,11 @@ function findDecoration(value, jsdoc_value, type) {
     }
 }
 
-function createReturnsDecorations(function_value, jsdoc_value, line_number) {
+function createReturnsDecoration(function_value, jsdoc_value, line_number) {
     const function_returns = `(${function_value[2]})`;
     const function_line = function_value[0];
     const returns_decoration = findDecoration(null, jsdoc_value, 'returns');
+    const all_returns_decoration = [];
 
     const render_options = {
         after: {
@@ -78,14 +85,18 @@ function createReturnsDecorations(function_value, jsdoc_value, line_number) {
 
     if (function_line.includes(function_returns)) {
         const range = createRange(function_line, function_returns, line_number);
-        decorations.set(range, render_options);
+        // decorations.set(range, render_options);
+        all_returns_decoration.push({ range, render_options });
     }
+
+    return all_returns_decoration;
 }
 
-function createParamsDecorations(function_value, jsdoc_value, line_number) {
+function createParamDecoration(function_value, jsdoc_value, line_number) {
     const function_param = function_value[2].split(',').map((param) => param.trim());
+    const all_param_decoration = [];
 
-    function_param.map((value) => {
+    function_param.forEach((value) => {
         const function_line = function_value[0];
         const param_decoration = findDecoration(value, jsdoc_value, 'param');
 
@@ -98,9 +109,11 @@ function createParamsDecorations(function_value, jsdoc_value, line_number) {
 
         if (function_line.includes(value)) {
             const range = createRange(function_line, value, line_number);
-            decorations.set(range, render_options);
+            all_param_decoration.push({ range, render_options });
         }
     });
+
+    return all_param_decoration;
 }
 
 function createRange(function_line, value, line_number) {
@@ -143,6 +156,5 @@ function createRange(function_line, value, line_number) {
 
 module.exports = {
     findDocParameters,
-    createDecorations,
-    decorations
+    createDecorations
 };
