@@ -38,7 +38,8 @@ function findDocParameters(source_code) {
 
 function createDecorations(source_code, jsdoc_parameters) {
     const function_matches = [...source_code.matchAll(regex.function.declaration)];
-    const decorations = new Map();
+    const param_decorations = [];
+    const returns_decorations = [];
 
     function_matches.forEach((function_value) => {
         const function_name = function_value[1];
@@ -49,16 +50,15 @@ function createDecorations(source_code, jsdoc_parameters) {
                 const line_number = lines.findIndex((line) => line.includes(function_value[0]));
 
                 const all_param_decoration = createParamDecoration(function_value, jsdoc_value, line_number);
-                const all_returns_decoration = createReturnsDecoration(function_value, jsdoc_value, line_number);
+                all_param_decoration.forEach((item) => param_decorations.push(item));
 
-                [...all_param_decoration, ...all_returns_decoration].forEach(({ range, render_options }) => {
-                    decorations.set(range, render_options);
-                });
+                const all_returns_decoration = createReturnsDecoration(function_value, jsdoc_value, line_number);
+                all_returns_decoration.forEach((item) => returns_decorations.push(item));
             }
         });
     });
 
-    return decorations;
+    return [param_decorations, returns_decorations];
 }
 
 function findDecoration(value, jsdoc_value, type) {
@@ -84,9 +84,7 @@ function createReturnsDecoration(function_value, jsdoc_value, line_number) {
     };
 
     if (function_line.includes(function_returns)) {
-        const range = createRange(function_line, function_returns, line_number);
-        // decorations.set(range, render_options);
-        all_returns_decoration.push({ range, render_options });
+        all_returns_decoration.push({ range: { function_line, value: function_returns, line_number }, render_options });
     }
 
     return all_returns_decoration;
@@ -108,8 +106,7 @@ function createParamDecoration(function_value, jsdoc_value, line_number) {
         };
 
         if (function_line.includes(value)) {
-            const range = createRange(function_line, value, line_number);
-            all_param_decoration.push({ range, render_options });
+            all_param_decoration.push({ range: { function_line, value, line_number }, render_options });
         }
     });
 
@@ -117,44 +114,51 @@ function createParamDecoration(function_value, jsdoc_value, line_number) {
 }
 
 function createRange(function_line, value, line_number) {
-    const start_index = function_line.indexOf(value);
-    const range = new vscode.Range(
-        new vscode.Position(line_number, start_index),
-        new vscode.Position(line_number, start_index + value.length)
-    );
-
+    const start_position = new vscode.Position(line_number, function_line.indexOf(value));
+    const end_position = new vscode.Position(line_number, start_position.character + value.length);
+    const range = { range: new vscode.Range(start_position, end_position) };
     return range;
 }
 
-// const applyDecorations = (editor) => {
-//     const document_text = editor.document.getText();
-//     const jsdoc_result = jsdocMatches(document_text);
-//     const jsdoc_first_result = jsdoc_result[0];
+function createType(render_options) {
+    return vscode.window.createTextEditorDecorationType(render_options);
+}
 
-//     const function_result = functionMatches(document_text, jsdoc_first_result);
+const mapped_decorations = [];
 
-//     const decoration_type = vscode.window.createTextEditorDecorationType(function_result.render);
-//     const text = function_result.returns;
-//     const lines = document_text.split('\n');
-//     const decorations = [];
+function createMappedDecoration(editor, decorations) {
+    const all_decorations = decorations.flat();
 
-//     for (let i = 0; i < lines.length; i++) {
-//         const line = lines[i];
+    for (let i = 0; i < all_decorations.length; i++) {
+        const { function_line, value, line_number } = all_decorations[i].range;
+        const range = createRange(function_line, value, line_number);
+        const type = createType(all_decorations[i].render_options);
 
-//         if (line.includes(text)) {
-//             const start_index = line.indexOf(text);
-//             const range = new vscode.Range(
-//                 new vscode.Position(i, start_index),
-//                 new vscode.Position(i, start_index + text.length)
-//             );
-//             decorations.push({ range });
-//         }
-//     }
+        // @ts-ignore
+        const key = `${range.range.c.c}${range.range.c.e}${range.range.e.e}`;
 
-//     editor.setDecorations(decoration_type, decorations);
-// };
+        const exists = mapped_decorations.some((item) => {
+            const exists_key = Object.keys(item)[0];
+            return exists_key === key;
+        });
+
+        if (!exists) {
+            mapped_decorations.push({ [key]: [range, type] });
+        }
+    }
+
+    applyDecorations(editor, mapped_decorations);
+}
+
+function applyDecorations(editor, all_decorations) {
+    all_decorations.forEach((item) => {
+        const [[range, type]] = Object.values(item);
+        editor.setDecorations(type, [range]);
+    });
+}
 
 module.exports = {
     findDocParameters,
-    createDecorations
+    createDecorations,
+    createMappedDecoration
 };
