@@ -1,15 +1,12 @@
-const { findDocParameters, createDecorations, createMappedDecoration } = require('./useful_functions.js');
+const { findDocParameters, createDecorations, manageDecorations } = require('./useful_functions.js');
 
-function decorationsManager(editor) {
+function insertDecorations(editor) {
     const source_code = editor.document.getText();
-
     const jsdoc_parameters = findDocParameters(source_code);
-
     const decorations = createDecorations(source_code, jsdoc_parameters);
-
-    createMappedDecoration(editor, decorations);
+    manageDecorations(editor, decorations);
 }
 
 module.exports = {
-    decorationsManager
+   insertDecorations
 };

@@ -1,16 +1,16 @@
 const _ = require('lodash');
 const vscode = require('vscode');
-const { decorationsManager } = require('./src/decorations_manager.js');
+const { insertDecorations } = require('./src/decorations_manager.js');
 
-const debounceDecorationsManager = _.debounce(decorationsManager, 1000);
+const debounceIncertDecorations = _.debounce(insertDecorations, 1000);
 
 function activate(context) {
     const editor = vscode.window.activeTextEditor;
 
-    decorationsManager(editor);
+    insertDecorations(editor);
 
     let disposable = vscode.commands.registerCommand('almost_static.almostStatic', function () {
-        // decorationsManager(editor);
+        // insertDecorations(editor);
     });
 
     // Executa quando o texto é alterado em um arquivo Javascript
@@ -19,7 +19,7 @@ function activate(context) {
             // vscode.window.visibleTextEditors.forEach((editor) => {
             vscode.window.visibleTextEditors.forEach(() => {
                 if (editor.document === event.document) {
-                    debounceDecorationsManager(editor);
+                    debounceIncertDecorations(editor);
                 }
             });
         }
@@ -51,9 +51,6 @@ function activate(context) {
     context.subscriptions.push(disposable);
 }
 
-function deactivate() {}
-
 module.exports = {
-    activate,
-    deactivate
+    activate
 };

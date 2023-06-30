@@ -124,35 +124,102 @@ function createType(render_options) {
     return vscode.window.createTextEditorDecorationType(render_options);
 }
 
-const mapped_decorations = [];
+function createMappedDecorations(decorations) {
+    const mapped_decorations = [];
 
-function createMappedDecoration(editor, decorations) {
-    const all_decorations = decorations.flat();
-
-    for (let i = 0; i < all_decorations.length; i++) {
-        const { function_line, value, line_number } = all_decorations[i].range;
+    decorations.forEach((item, index) => {
+        const { function_line, value, line_number } = item.range;
         const range = createRange(function_line, value, line_number);
-        const type = createType(all_decorations[i].render_options);
-
+        const type = createType(decorations[index].render_options);
         // @ts-ignore
-        const key = `${range.range.c.c}${range.range.c.e}${range.range.e.e}`;
+        const key = `${range.range.c.c}${range.range.c.e}${range.range.e.e}${value}`;
+        mapped_decorations.push({ range, type, key });
+    });
 
-        const exists = mapped_decorations.some((item) => {
-            const exists_key = Object.keys(item)[0];
-            return exists_key === key;
-        });
-
-        if (!exists) {
-            mapped_decorations.push({ [key]: [range, type] });
-        }
-    }
-
-    applyDecorations(editor, mapped_decorations);
+    return mapped_decorations;
 }
 
-function applyDecorations(editor, all_decorations) {
-    all_decorations.forEach((item) => {
-        const [[range, type]] = Object.values(item);
+function getObjectsOnlyInB(arrayA, arrayB) {
+    return arrayB.filter((objB) => !arrayA.some((objA) => objA.key === objB.key));
+}
+
+function getObjectsOnlyInA(arrayA, arrayB) {
+    return arrayA.filter((objA) => !arrayB.some((objB) => objB.key === objA.key));
+}
+
+function getObjectsInB(arrayA, arrayB) {
+    const onlyA = getObjectsOnlyInA(arrayA, arrayB);
+    const keysA = onlyA.map((objA) => objA.key);
+    const inB = arrayB.filter((objB) => !keysA.includes(objB.key));
+    return inB;
+}
+
+let applied_decorations = [];
+
+function manageDecorations(editor, decorations) {
+    const arrayA = applied_decorations;
+    const arrayB = createMappedDecorations(decorations.flat());
+
+    const onlyA = getObjectsOnlyInA(arrayA, arrayB);
+    const onlyB = getObjectsOnlyInB(arrayA, arrayB);
+    const inB = getObjectsInB(arrayA, arrayB);
+
+    clearDecorations(editor, onlyA);
+    applyDecorations(editor, onlyB);
+
+    applied_decorations = getObjectsInB(arrayA, arrayB);
+
+    // console.log(onlyB);
+    // console.log(inB);
+
+    // salva as decorações aplicadas
+    // arrayB.forEach((item) => {
+    //     applied_decorations.push(item);
+    // });
+
+    // const key_decorations_applied = new Set(applied_decorations.map((item) => item.key));
+    // const key_new_decorations = new Set(new_decorations.map((item) => item.key));
+    // const key_decorations_cleaning = new Set(
+    //     [...key_decorations_applied].filter((value) => !key_new_decorations.has(value))
+    // );
+    // const key_new_decorations_application = new Set(
+    //     [...key_new_decorations].filter((valor) => !key_decorations_applied.has(valor))
+    // );
+
+    // decorations_cleaning = [];
+
+    // decorations_cleaning = applied_decorations.filter((item) => key_decorations_cleaning.has(item.key));
+
+    // new_decorations_application = new_decorations.filter((item) => !key_new_decorations_application.has(item.key));
+
+    // applied_decorations = applied_decorations.filter(
+    //     (first_item) => !new_decorations_application.some((second_item) => first_item.key === second_item.key)
+    // );
+
+    // applied_decorations = applied_decorations.filter(
+    //     (first_item) => !decorations_cleaning.some((second_item) => first_item.key === second_item.key)
+    // );
+
+    // console.log(applied_decorations);
+    // console.log(decorations_cleaning);
+    // console.log(new_decorations_application);
+
+    // clearDecorations(editor)
+    // applyDecorations(editor);
+}
+
+function clearDecorations(editor, decorations) {
+    decorations.forEach((item) => {
+        item.dispose();
+        // const type = item.type;
+        // editor.setDecorations(type, []);
+    });
+}
+
+function applyDecorations(editor, decorations) {
+    decorations.forEach((item) => {
+        const range = item.range;
+        const type = item.type;
         editor.setDecorations(type, [range]);
     });
 }
@@ -160,5 +227,5 @@ function applyDecorations(editor, all_decorations) {
 module.exports = {
     findDocParameters,
     createDecorations,
-    createMappedDecoration
+    manageDecorations
 };
