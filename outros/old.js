@@ -154,58 +154,62 @@ function getObjectsInB(arrayA, arrayB) {
     return inB;
 }
 
-let applied_decorations = [];
+// let applied_decorations = [];
 
-function manageDecorations(editor, decorations) {
-    const arrayA = applied_decorations;
-    const arrayB = createMappedDecorations(decorations.flat());
+// function manageDecorations(editor, decorations) {
+//     const arrayA = applied_decorations;
+//     const arrayB = createMappedDecorations(decorations.flat());
 
-    const onlyA = getObjectsOnlyInA(arrayA, arrayB);
-    const onlyB = getObjectsOnlyInB(arrayA, arrayB);
-    const inB = getObjectsInB(arrayA, arrayB);
+//     const onlyA = getObjectsOnlyInA(arrayA, arrayB);
+//     const onlyB = getObjectsOnlyInB(arrayA, arrayB);
+//     const inB = getObjectsInB(arrayA, arrayB);
 
-    clearDecorations(editor, onlyA);
-    applyDecorations(editor, onlyB);
+//     clearDecorations(editor, onlyA);
+//     applyDecorations(editor, onlyB);
 
-    applied_decorations = getObjectsInB(arrayA, arrayB);
+//     applied_decorations = getObjectsInB(arrayA, arrayB);
 
-    // console.log(onlyB);
-    // console.log(inB);
+//     // console.log(onlyB);
+//     // console.log(inB);
 
-    // salva as decorações aplicadas
-    // arrayB.forEach((item) => {
-    //     applied_decorations.push(item);
-    // });
+//     // salva as decorações aplicadas
+//     // arrayB.forEach((item) => {
+//     //     applied_decorations.push(item);
+//     // });
 
-    // const key_decorations_applied = new Set(applied_decorations.map((item) => item.key));
-    // const key_new_decorations = new Set(new_decorations.map((item) => item.key));
-    // const key_decorations_cleaning = new Set(
-    //     [...key_decorations_applied].filter((value) => !key_new_decorations.has(value))
-    // );
-    // const key_new_decorations_application = new Set(
-    //     [...key_new_decorations].filter((valor) => !key_decorations_applied.has(valor))
-    // );
+//     // const key_decorations_applied = new Set(applied_decorations.map((item) => item.key));
+//     // const key_new_decorations = new Set(new_decorations.map((item) => item.key));
+//     // const key_decorations_cleaning = new Set(
+//     //     [...key_decorations_applied].filter((value) => !key_new_decorations.has(value))
+//     // );
+//     // const key_new_decorations_application = new Set(
+//     //     [...key_new_decorations].filter((valor) => !key_decorations_applied.has(valor))
+//     // );
 
-    // decorations_cleaning = [];
+//     // decorations_cleaning = [];
 
-    // decorations_cleaning = applied_decorations.filter((item) => key_decorations_cleaning.has(item.key));
+//     // decorations_cleaning = applied_decorations.filter((item) => key_decorations_cleaning.has(item.key));
 
-    // new_decorations_application = new_decorations.filter((item) => !key_new_decorations_application.has(item.key));
+//     // new_decorations_application = new_decorations.filter((item) => !key_new_decorations_application.has(item.key));
 
-    // applied_decorations = applied_decorations.filter(
-    //     (first_item) => !new_decorations_application.some((second_item) => first_item.key === second_item.key)
-    // );
+//     // applied_decorations = applied_decorations.filter(
+//     //     (first_item) => !new_decorations_application.some((second_item) => first_item.key === second_item.key)
+//     // );
 
-    // applied_decorations = applied_decorations.filter(
-    //     (first_item) => !decorations_cleaning.some((second_item) => first_item.key === second_item.key)
-    // );
+//     // applied_decorations = applied_decorations.filter(
+//     //     (first_item) => !decorations_cleaning.some((second_item) => first_item.key === second_item.key)
+//     // );
 
-    // console.log(applied_decorations);
-    // console.log(decorations_cleaning);
-    // console.log(new_decorations_application);
+//     // console.log(applied_decorations);
+//     // console.log(decorations_cleaning);
+//     // console.log(new_decorations_application);
 
-    // clearDecorations(editor)
-    // applyDecorations(editor);
+//     // clearDecorations(editor)
+//     // applyDecorations(editor);
+// }
+
+function manageDecorations(params) {
+    
 }
 
 function clearDecorations(editor, decorations) {

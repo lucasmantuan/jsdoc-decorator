@@ -1,9 +1,10 @@
 {
-    "name": "decorator-sample",
-    "description": "decorator-sample",
+    "name": "almost_static",
+    "displayName": "Almost Static",
+    "description": "Almost Static",
     "version": "0.0.1",
     "engines": {
-        "vscode": "^1.73.0"
+        "vscode": "^1.79.0"
     },
     "categories": [
         "Other"
@@ -11,20 +12,8 @@
     "activationEvents": [
         "*"
     ],
-    "main": "./extension.js",
-    "contributes": {
-        "colors": [
-            {
-                "id": "myextension.largeNumberBackground",
-                "description": "Background decoration color for large numbers",
-                "defaults": {
-                    "dark": "#FF000055",
-                    "light": "#FF000055",
-                    "highContrast": "#FF000055"
-                }
-            }
-        ]
-    },
+    "main": "./src/almost_static.js",
+    "contributes": {},
     "scripts": {
         "lint": "eslint .",
         "pretest": "npm run lint",
