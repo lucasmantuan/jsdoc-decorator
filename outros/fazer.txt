@@ -1,5 +1,0 @@
-- Converter as funções para se utilizar a biblioteca lodash
-- Melhorar o armazenamento das decorações, alterando a estrutura de dados
-- Revisar todos os regex, alterando para casar somente com os dados necessários
-- Verificar a necessidade de se adicionar promise no código
-- Verificar a necessidade do teste comparando se o editor é o editor atual
