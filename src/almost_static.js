@@ -1,4 +1,5 @@
 const vscode = require('vscode');
+const { createHash } = require('node:crypto');
 const { regex } = require('./regex_pattern.js');
 
 let active_editor = vscode.window.activeTextEditor;
@@ -27,7 +28,9 @@ function criarArrA(params, code) {
 }
 
 function criarChaveUnica(key) {
-    return Array.from(key).reduce((hash, char) => hash * 33 * char.charCodeAt(0), 5381) % 1013;
+    const hash = createHash('sha256');
+    hash.update(key);
+    return hash.digest('hex');
 }
 
 function adicionarNoArrB(arrA, arrB) {
@@ -36,8 +39,9 @@ function adicionarNoArrB(arrA, arrB) {
         if (!exists) {
             const match = obj.match[0].match(regex.function.declaration);
             const range = createRange(match, obj.match.index);
-            const type = obj.match[0].match(regex.jsdoc.returns)[1];
-            const decoration = createDecoration(': ' + type);
+            const returns = obj.match[0].match(regex.jsdoc.returns);
+            const type = returns === null ? '' : `: ${returns[1]}`;
+            const decoration = createDecoration(type);
             arrB.push({ key: obj.key, range, decoration, visible: obj.visible });
         }
     }

@@ -9,6 +9,14 @@ function leela(num) {
      * @returns {string}
      */
     function fry() {
+        /**
+         * @name professor
+         * @param {object} obj
+         * @returns {object}
+         */
+        function professor(obj) {
+            return obj;
+        }
         return 'fry';
     }
     return 1 + num;
@@ -26,6 +34,6 @@ function bender(param) {
  * @name zoidberg
  * @returns {undefined}
  */
-function zoidberg(text) {
+function zoidberg() {
     return undefined;
 }
