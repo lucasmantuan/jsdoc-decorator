@@ -1,4 +1,5 @@
 const vscode = require('vscode');
+const _ = require('lodash');
 const { createHash } = require('node:crypto');
 const { regex } = require('./regex_pattern.js');
 
@@ -21,10 +22,18 @@ function updateDecorations() {
 
 function criarArrA(params, code) {
     const matches = code.matchAll(params);
-    return Array.from(matches, (match) => {
+    const arrProvisorio = Array.from(matches, (match) => {
         const key = criarChaveUnica(match[0]);
-        return arrA.push({ key, match, visible: false });
+        const jsdoc_name = match[0].match(regex.jsdoc.name)[1];
+        const function_name = match[0].match(regex.function.declaration)[1];
+        if (jsdoc_name === function_name) {
+            return { key, match, visible: false };
+        } else {
+            return;
+        }
     });
+    const arrFinal = _.filter(arrProvisorio, (item) => item !== undefined);
+    arrA = arrA.concat(arrFinal);
 }
 
 function criarChaveUnica(key) {

@@ -1,65 +1,17 @@
-# almost-static README
+# Almost Static
 
-This is the README for your extension "almost-static". After writing up a brief description, we recommend including the following sections.
+Extensão para o Visual Studio Code que aprimora a experiência de edição de código JavaScript. Ela realiza as seguintes ações:
 
-## Features
+Identificação de Funções: A aplicação utiliza expressões regulares para identificar funções no código JavaScript.
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+Criação de Chaves Únicas: Para identificar funções exclusivamente, a aplicação cria chaves únicas com base no conteúdo das funções.
 
-For example if there is an image subfolder under your extension project workspace:
+Adição de Decorações Visuais: A extensão adiciona decorações visuais ao código-fonte para destacar funções, tornando-as mais visíveis para o desenvolvedor.
 
-\!\[feature X\]\(images/feature-x.png\)
+Documentação Aprimorada: Quando aplicável, a aplicação também fornece informações de documentação relacionadas às funções, como o tipo de retorno.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+Atualização Automática: A extensão reage a alterações no código-fonte, atualizando as decorações conforme necessário para manter a consistência e a relevância das informações visuais.
 
-## Requirements
+Limpeza de Decorações e Listas: A aplicação oferece a capacidade de remover decorações e limpar listas de funções identificadas, permitindo ao desenvolvedor um controle preciso sobre o que está sendo exibido.
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Essa extensão é projetada para auxiliar os programadores que trabalham com JavaScript no Visual Studio Code, melhorando a compreensão do código, facilitando a navegação e a identificação de funções e proporcionando uma experiência de edição mais eficiente.
