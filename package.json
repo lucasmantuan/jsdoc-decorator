@@ -1,18 +1,23 @@
 {
-    "name": "almost-static",
-    "displayName": "Almost Static",
-    "description": "Almost Static",
+    "name": "jsdoc-decorator",
+    "displayName": "JSDoc Decorator",
+    "description": "JSDoc Decorator",
+    "author": {
+        "name": "Lucas Mantuan",
+        "url": "http://lucasmantuan.com.br"
+    },
     "version": "0.0.1",
     "engines": {
         "vscode": "^1.79.0"
     },
     "categories": [
-        "Other"
+        "Formatters",
+        "Visualization"
     ],
     "activationEvents": [
         "*"
     ],
-    "main": "./src/almost_static.js",
+    "main": "./src/jsdoc-decorator.js",
     "contributes": {},
     "scripts": {
         "lint": "eslint .",

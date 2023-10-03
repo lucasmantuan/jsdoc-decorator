@@ -1,39 +1,22 @@
 /**
  * @name leela
  * @param {number} num
- * @returns {number}
+ * @returns {undefined}
  */
 function leela(num) {
     /**
-     * @name fry
-     * @returns {string}
+     * @name bender
+     * @returns {Object}
      */
-    function fry() {
+    function bender(param) {
         /**
-         * @name professor
-         * @param {object} obj
-         * @returns {object}
+         * @name zoidberg
+         * @returns {Array<Object>}
          */
-        function professor(obj) {
-            return obj;
+        function zoidberg() {
+            return undefined;
         }
-        return 'fry';
+        return true;
     }
     return 1 + num;
-}
-
-/**
- * @name bender
- * @returns {boolean}
- */
-function bender(param) {
-    return true;
-}
-
-/**
- * @name zoidberg
- * @returns {undefined}
- */
-function zoidberg() {
-    return undefined;
 }

@@ -1,14 +1,13 @@
 const regex = {
     jsdoc: {
-        comment: /\/\*\*([\s\S]*?)\*\//g,
         name: /@name\s+(\w+)/,
-        param: /@param\s+{(\S+?)}\s+(\w+)/g,
+        param: /@param\s+{(\S+?)}\s+(\w+)/,
         returns: /@returns\s+{(\S+?)}/
     },
     function: {
         declaration: /function\s+(\w+)\s*\((.*?)\)/
     },
-    combo: {
+    comment: {
         function: {
             declaration: /\/\*\*[\s\S]*?function[\s\S]*?{/g
         }
