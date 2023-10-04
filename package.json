@@ -2,6 +2,7 @@
     "name": "jsdoc-decorator",
     "displayName": "JSDoc Decorator",
     "description": "JSDoc Decorator",
+    "publisher": "lucasmantuan",
     "author": {
         "name": "Lucas Mantuan",
         "url": "http://lucasmantuan.com.br"
