@@ -1,4 +1,4 @@
-export const regex = {
+const regex = {
     jsdoc: {
         name: /@name\s+(\w+)/,
         param: /@param\s+{(\S+?)}\s+(\w+)/,
@@ -13,3 +13,5 @@ export const regex = {
         }
     }
 };
+
+module.exports = { regex };

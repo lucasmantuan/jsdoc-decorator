@@ -1,7 +1,7 @@
 {
     "name": "jsdoc-decorator",
     "displayName": "JSDoc Decorator",
-    "description": "JSDoc Decorator",
+    "description": "Adiciona decorações no código com base no JSDoc",
     "publisher": "lucasmantuan",
     "author": {
         "name": "Lucas Mantuan",

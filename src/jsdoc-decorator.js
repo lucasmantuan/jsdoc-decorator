@@ -1,9 +1,9 @@
-import { toArray, map, filter, forEach, some, remove, debounce } from 'lodash';
-import { window, Range, workspace } from 'vscode';
-import { createHash } from 'node:crypto';
-import { regex } from './regex_pattern.mjs';
+const vscode = require('vscode');
+const _ = require('lodash');
+const { createHash } = require('node:crypto');
+const { regex } = require('./regex_pattern.js');
 
-let active_editor = window.activeTextEditor;
+let active_editor = vscode.window.activeTextEditor;
 let initial_values = [];
 let applied_decorations = [];
 let decorations_for_removal = [];
@@ -27,15 +27,15 @@ function updateDecorations() {
  * @returns {void}
  */
 function extractInitialValues(param, code) {
-    const matches = toArray(code.matchAll(param));
-    const unfiltered = map(matches, (match) => {
+    const matches = _.toArray(code.matchAll(param));
+    const unfiltered = _.map(matches, (match) => {
         const key = createHashCode(match[0]);
         const jsdoc_name = match[0].match(regex.jsdoc.name)[1];
         const function_name = match[0].match(regex.function.declaration)[1];
         if (jsdoc_name === function_name) return { key, match, visible: false };
         return;
     });
-    initial_values = filter(unfiltered, (item) => item !== undefined);
+    initial_values = _.filter(unfiltered, (item) => item !== undefined);
 }
 
 /**
@@ -56,8 +56,8 @@ function createHashCode(key) {
  * @returns {void}
  */
 function createDecorationsToApply(source, target) {
-    forEach(source, (elements) => {
-        const exists = some(target, (item) => item.key === elements.key);
+    _.forEach(source, (elements) => {
+        const exists = _.some(target, (item) => item.key === elements.key);
         if (!exists) {
             const match = elements.match[0].match(regex.function.declaration);
             const range = createRange(match, elements.match.index);
@@ -78,7 +78,7 @@ function createDecorationsToApply(source, target) {
 function createRange(match, index) {
     const start_position = active_editor.document.positionAt(index + match.index);
     const end_position = active_editor.document.positionAt(index + match.index + match[0].length);
-    return { range: new Range(start_position, end_position) };
+    return { range: new vscode.Range(start_position, end_position) };
 }
 
 /**
@@ -87,7 +87,7 @@ function createRange(match, index) {
  * @returns {Object}
  */
 function createDecoration(text) {
-    return window.createTextEditorDecorationType({
+    return vscode.window.createTextEditorDecorationType({
         after: {
             color: '#808080',
             contentText: text,
@@ -104,8 +104,8 @@ function createDecoration(text) {
  * @returns {void}
  */
 function filterDecorationsForRemoval(source, target, result) {
-    const keys = new Set(map(source, (item) => item.key));
-    result.push(...filter(target, (item) => !keys.has(item.key)));
+    const keys = new Set(_.map(source, (item) => item.key));
+    result.push(..._.filter(target, (item) => !keys.has(item.key)));
 }
 
 /**
@@ -115,8 +115,8 @@ function filterDecorationsForRemoval(source, target, result) {
  * @returns {void}
  */
 function removeValues(source, target) {
-    const keys = new Set(map(target, (item) => item.key));
-    remove(source, (item) => keys.has(item.key));
+    const keys = new Set(_.map(target, (item) => item.key));
+    _.remove(source, (item) => keys.has(item.key));
 }
 
 /**
@@ -125,7 +125,7 @@ function removeValues(source, target) {
  * @returns {void}
  */
 function applyDecorations(decorations) {
-    forEach(decorations, (item) => {
+    _.forEach(decorations, (item) => {
         if (!item.visible) {
             item.visible = true;
             active_editor.setDecorations(item.decoration, [item.range]);
@@ -139,18 +139,18 @@ function applyDecorations(decorations) {
  * @returns {void}
  */
 function removeDecorations(decorations) {
-    forEach(decorations, (item) => {
+    _.forEach(decorations, (item) => {
         item.decoration.dispose();
     });
     decorations.length = 0;
 }
 
 function activate(context) {
-    const debounceUpdateDecorations = debounce(updateDecorations, 1000);
+    const debounceUpdateDecorations = _.debounce(updateDecorations, 1000);
 
     if (active_editor) updateDecorations();
 
-    window.onDidChangeActiveTextEditor(
+    vscode.window.onDidChangeActiveTextEditor(
         (editor) => {
             active_editor = editor;
             if (editor) {
@@ -161,7 +161,7 @@ function activate(context) {
         context.subscriptions
     );
 
-    workspace.onDidChangeTextDocument(
+    vscode.workspace.onDidChangeTextDocument(
         (event) => {
             if (active_editor && event.document === active_editor.document) {
                 console.log('onDidChangeTextDocument');
@@ -172,11 +172,11 @@ function activate(context) {
         context.subscriptions
     );
 
-    workspace.onDidCloseTextDocument(() => {
+    vscode.workspace.onDidCloseTextDocument(() => {
         removeDecorations(applied_decorations);
     });
 }
 
-export default {
+module.exports = {
     activate
 };
