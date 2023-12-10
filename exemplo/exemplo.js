@@ -1,22 +1,64 @@
 /**
- * @name leela
+ * @name fry
  * @param {number} num
- * @returns {undefined}
+ * @returns {number}
  */
-function leela(num) {
+const fry = function (num) {
     /**
-     * @name bender
-     * @returns {Object}
+     * @name zoidberg
+     * @returns {Array<Object>}
      */
-    function bender(param) {
+    function zoidberg(obj) {
         /**
-         * @name zoidberg
-         * @returns {Array<Object>}
+         * @name bender
+         * @param {string} str
+         * @returns {string}
          */
-        function zoidberg() {
-            return undefined;
-        }
-        return true;
+        obj = [{}];
+        const bender = (str) => str;
+        return obj;
     }
-    return 1 + num;
+    return num;
+};
+
+/**
+ * @name wrapFunction
+ * @param {Function} fn
+ * @returns {Function}
+ */
+function wrapFunction(fn) {
+    return fn;
 }
+
+const myFunction = wrapFunction(function () {
+    return 'string';
+});
+
+const leela = {
+    /**
+     * @name professor
+     * @param {boolean} bol
+     * @returns {boolean}
+     */
+    professor: function (bol) {
+        return false;
+    },
+
+    /**
+     * @name amy
+     * @param {boolean} str
+     * @returns {string}
+     */
+    amy: (str) => 'string'
+};
+
+const myObject = {
+    /**
+     * @name teste
+     * @param {Array} qqc
+     * @returns {Array}
+     */
+    teste(qqc) {
+        return qqc;
+    }
+};

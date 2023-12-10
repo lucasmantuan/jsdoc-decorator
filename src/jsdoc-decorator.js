@@ -1,5 +1,5 @@
-const vscode = require('vscode');
 const _ = require('lodash');
+const vscode = require('vscode');
 const { createHash } = require('node:crypto');
 const { regex } = require('./regex_pattern.js');
 
@@ -10,9 +10,63 @@ let decorations_for_removal = [];
 
 function updateDecorations() {
     if (!active_editor) return;
+
     const source_code = active_editor.document.getText();
-    extractInitialValues(regex.comment.function.declaration, source_code);
-    createDecorationsToApply(initial_values, applied_decorations);
+
+    const function_declaration = extractInitialValues(
+        regex.comment.jsdoc,
+        regex.comment.function.declaration,
+        regex.jsdoc.name,
+        regex.function.declaration,
+        source_code
+    );
+
+    const function_expression = extractInitialValues(
+        regex.comment.jsdoc,
+        regex.comment.function.expression,
+        regex.jsdoc.name,
+        regex.function.expression,
+        source_code
+    );
+
+    const function_arrow = extractInitialValues(
+        regex.comment.jsdoc,
+        regex.comment.function.arrow,
+        regex.jsdoc.name,
+        regex.function.arrow,
+        source_code
+    );
+
+    const method_expression = extractInitialValues(
+        regex.comment.jsdoc,
+        regex.comment.method.expression,
+        regex.jsdoc.name,
+        regex.method.expression,
+        source_code
+    );
+
+    const method_arrow = extractInitialValues(
+        regex.comment.jsdoc,
+        regex.comment.method.arrow,
+        regex.jsdoc.name,
+        regex.method.arrow,
+        source_code
+    );
+
+    initial_values = _.concat(
+        function_declaration,
+        function_expression,
+        function_arrow,
+        method_expression,
+        method_arrow
+    );
+
+    createDecorationsToApply(initial_values, applied_decorations, regex.function.declaration, regex.jsdoc.returns);
+    createDecorationsToApply(initial_values, applied_decorations, regex.function.expression, regex.jsdoc.returns);
+    createDecorationsToApply(initial_values, applied_decorations, regex.function.arrow, regex.jsdoc.returns);
+    createDecorationsToApply(initial_values, applied_decorations, regex.method.expression, regex.jsdoc.returns);
+    createDecorationsToApply(initial_values, applied_decorations, regex.method.arrow, regex.jsdoc.returns);
+
     filterDecorationsForRemoval(initial_values, applied_decorations, decorations_for_removal);
     removeValues(initial_values, applied_decorations);
     removeValues(applied_decorations, decorations_for_removal);
@@ -20,72 +74,91 @@ function updateDecorations() {
     applyDecorations(applied_decorations);
 }
 
-/**
- * @name criarArrA
- * @param {RegExp} param
- * @param {string} code
- * @returns {void}
- */
-function extractInitialValues(param, code) {
-    const matches = _.toArray(code.matchAll(param));
-    const unfiltered = _.map(matches, (match) => {
-        const key = createHashCode(match[0]);
-        const jsdoc_name = match[0].match(regex.jsdoc.name)[1];
-        const function_name = match[0].match(regex.function.declaration)[1];
-        if (jsdoc_name === function_name) return { key, match, visible: false };
-        return;
+function extractInitialValues(rgx1, rgx2, rgx3, rgx4, code) {
+    const matches_jsdoc = _.toArray(code.matchAll(rgx1));
+    const matches_code = _.toArray(code.matchAll(rgx2));
+    const result = [];
+    _.forEach(matches_jsdoc, (match_jsdoc) => {
+        const jsdoc_name = match_jsdoc[0].match(rgx3);
+        _.forEach(matches_code, (match_code) => {
+            const code_name = match_code[0].match(rgx4);
+            try {
+                if (jsdoc_name[1].trim() === code_name[1].trim()) {
+                    const key = createHashCode(match_jsdoc[0] + match_code[0]);
+                    result.push({ key, code: match_code, doc: match_jsdoc, visible: false });
+                }
+            } catch (error) {
+                console.log(error.message);
+            }
+        });
     });
-    initial_values = _.filter(unfiltered, (item) => item !== undefined);
+    return result;
 }
 
-/**
- * @name createHashCode
- * @param {string} key
- * @returns {string}
- */
+// function extractInitialValues(rgx1, rgx2, rgx3, code) {
+//     const matches = _.toArray(code.matchAll(rgx1));
+//     const unfiltered = _.map(matches, (match) => {
+//         const key = createHashCode(match[0]);
+//         const jsdoc_name = match[0].match(rgx2);
+//         const code_name = match[0].match(rgx3);
+//         if (code_name !== null) {
+//             if (jsdoc_name[1] === code_name[1]) {
+//                 return { key, match, visible: false };
+//             }
+//         }
+//         return;
+//     });
+//     return _.filter(unfiltered, (item) => item !== undefined);
+// }
+
+// function extractInitialValues(param, code) {
+//     const matches = _.toArray(code.matchAll(param));
+//     const unfiltered = _.map(matches, (match) => {
+//         const key = createHashCode(match[0]);
+//         const jsdoc_name = match[0].match(regex.jsdoc.name)[1];
+
+//         if (match[1] === undefined) {
+//             const function_declaration_name = match[0].match(regex.function.declaration)[1];
+//             if (jsdoc_name === function_declaration_name) return { key, match, visible: false };
+//         } else {
+//             const function_expression_name = match[0].match(regex.function.expression)[1];
+//             if (jsdoc_name === function_expression_name) return { key, match, visible: false };
+//         }
+
+//         return;
+//     });
+//     return _.filter(unfiltered, (item) => item !== undefined);
+// }
+
 function createHashCode(key) {
     const hash = createHash('sha256');
     hash.update(key);
     return hash.digest('hex');
 }
 
-/**
- * @name createDecorationsToApply
- * @param {Array} source
- * @param {Array} target
- * @returns {void}
- */
-function createDecorationsToApply(source, target) {
-    _.forEach(source, (elements) => {
-        const exists = _.some(target, (item) => item.key === elements.key);
+function createDecorationsToApply(source, target, rgx1, rgx2) {
+    _.forEach(source, (element) => {
+        const exists = _.some(target, (item) => item.key === element.key);
         if (!exists) {
-            const match = elements.match[0].match(regex.function.declaration);
-            const range = createRange(match, elements.match.index);
-            const returns = elements.match[0].match(regex.jsdoc.returns);
-            const type = returns === null ? '' : `: ${returns[1]}`;
-            const decoration = createDecoration(type);
-            target.push({ key: elements.key, range, decoration, visible: elements.visible });
+            const match_code = element.code[0].match(rgx1);
+            if (match_code !== null) {
+                const adjustment = match_code[3] !== undefined ? match_code[3].length : 0;
+                const range = createRange(match_code, element.code.index, adjustment);
+                const match_doc = element.doc[0].match(rgx2);
+                const type = match_doc === null ? '' : `: ${match_doc[1]}`;
+                const decoration = createDecoration(type);
+                target.push({ key: element.key, range, decoration, visible: element.visible });
+            }
         }
     });
 }
 
-/**
- * @name createRange
- * @param {RegExpExecArray} match
- * @param {number} index
- * @returns {Object}
- */
-function createRange(match, index) {
+function createRange(match, index, adjustment) {
     const start_position = active_editor.document.positionAt(index + match.index);
-    const end_position = active_editor.document.positionAt(index + match.index + match[0].length);
+    const end_position = active_editor.document.positionAt(index + match.index + match[0].length - adjustment);
     return { range: new vscode.Range(start_position, end_position) };
 }
 
-/**
- * @name createDecoration
- * @param {string} text
- * @returns {Object}
- */
 function createDecoration(text) {
     return vscode.window.createTextEditorDecorationType({
         after: {
@@ -96,34 +169,16 @@ function createDecoration(text) {
     });
 }
 
-/**
- * @name filterDecorationsForRemoval
- * @param {Array} source
- * @param {Array} target
- * @param {Array} result
- * @returns {void}
- */
 function filterDecorationsForRemoval(source, target, result) {
     const keys = new Set(_.map(source, (item) => item.key));
     result.push(..._.filter(target, (item) => !keys.has(item.key)));
 }
 
-/**
- * @name removeValues
- * @param {Array} source
- * @param {Array} target
- * @returns {void}
- */
 function removeValues(source, target) {
     const keys = new Set(_.map(target, (item) => item.key));
     _.remove(source, (item) => keys.has(item.key));
 }
 
-/**
- * @name applyDecorations
- * @param {Array} decorations
- * @returns {void}
- */
 function applyDecorations(decorations) {
     _.forEach(decorations, (item) => {
         if (!item.visible) {
@@ -133,11 +188,6 @@ function applyDecorations(decorations) {
     });
 }
 
-/**
- * @name removeDecorations
- * @param {Array} decorations
- * @returns {void}
- */
 function removeDecorations(decorations) {
     _.forEach(decorations, (item) => {
         item.decoration.dispose();
@@ -164,7 +214,6 @@ function activate(context) {
     vscode.workspace.onDidChangeTextDocument(
         (event) => {
             if (active_editor && event.document === active_editor.document) {
-                console.log('onDidChangeTextDocument');
                 debounceUpdateDecorations();
             }
         },
